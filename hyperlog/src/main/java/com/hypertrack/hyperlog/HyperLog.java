@@ -201,8 +201,8 @@ public class HyperLog {
     public static void v(String tag, String message, Throwable tr) {
         if (Log.VERBOSE >= logLevel) {
             Log.v(tag, message + '\n' + Log.getStackTraceString(tr));
+            r(getFormattedLog(logLevel, tag, message));
         }
-        r(getFormattedLog(logLevel, tag, message));
     }
 
     public static void v(String tag, String message) {
@@ -212,9 +212,8 @@ public class HyperLog {
     public static void d(String tag, String message, Throwable tr) {
         if (Log.DEBUG >= logLevel) {
             Log.d(tag, message + '\n' + Log.getStackTraceString(tr));
+            r(getFormattedLog(logLevel, tag, message));
         }
-        r(getFormattedLog(logLevel, tag, message));
-
     }
 
     public static void d(String tag, String message) {
@@ -224,9 +223,8 @@ public class HyperLog {
     public static void i(String tag, String message, Throwable tr) {
         if (Log.INFO >= logLevel) {
             Log.i(tag, message + '\n' + Log.getStackTraceString(tr));
+            r(getFormattedLog(Log.INFO, tag, message));
         }
-
-        r(getFormattedLog(Log.INFO, tag, message));
     }
 
     /**
@@ -239,9 +237,8 @@ public class HyperLog {
     public static void w(String tag, String message, Throwable tr) {
         if (Log.WARN >= logLevel) {
             Log.w(tag, message + '\n' + Log.getStackTraceString(tr));
+            r(getFormattedLog(Log.WARN, tag, message));
         }
-
-        r(getFormattedLog(Log.WARN, tag, message));
     }
 
     public static void w(String tag, String message) {
@@ -251,9 +248,8 @@ public class HyperLog {
     public static void e(String tag, String message, Throwable tr) {
         if (Log.ERROR >= logLevel) {
             Log.e(tag, message + '\n' + Log.getStackTraceString(tr));
+            r(getFormattedLog(Log.ERROR, tag, message));
         }
-
-        r(getFormattedLog(Log.ERROR, tag, message));
     }
 
     public static void e(String tag, String message) {
@@ -266,9 +262,9 @@ public class HyperLog {
             Log.e(tag, "EXCEPTION: " + getMethodName() + ", " + message + '\n' +
                     Log.getStackTraceString(tr));
             Log.e(tag, "**********************************************");
+            r(getFormattedLog(Log.ERROR, tag, "EXCEPTION: " + getMethodName() + ", "
+                    + message));
         }
-        r(getFormattedLog(Log.ERROR, tag, "EXCEPTION: " + getMethodName() + ", "
-                + message));
     }
 
     public static void exception(String tag, String message) {
@@ -643,9 +639,8 @@ public class HyperLog {
         while (logsBatchCount != 0) {
 
             final List<DeviceLogModel> deviceLogs = getDeviceLogs(false, logsBatchCount);
-            deviceLogs.add(new DeviceLogModel(getFormattedLog(Log.INFO, TAG_HYPERLOG,
-                    "Log Counts: " + deviceLogs.size() + " | File Size: " +
-                            deviceLogs.toString().length() + " bytes.")));
+            HyperLog.i(TAG, "Log Counts: " + deviceLogs.size() + " | File Size: " +
+                    deviceLogs.toString().length() + " bytes.");
             //Get string data into byte format.
             byte[] bytes = Utils.getByteData(deviceLogs);
 
