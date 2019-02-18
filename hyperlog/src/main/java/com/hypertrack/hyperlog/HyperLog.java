@@ -639,7 +639,7 @@ public class HyperLog {
         while (logsBatchCount != 0) {
 
             final List<DeviceLogModel> deviceLogs = getDeviceLogs(false, logsBatchCount);
-            HyperLog.i(TAG, "Log Counts: " + deviceLogs.size() + " | File Size: " +
+            HyperLog.d(TAG, "Log Counts: " + deviceLogs.size() + " | File Size: " +
                     deviceLogs.toString().length() + " bytes.");
             //Get string data into byte format.
             byte[] bytes = Utils.getByteData(deviceLogs);
@@ -655,7 +655,7 @@ public class HyperLog {
                         public void onResponse(Object response) {
                             temp[0]--;
                             mDeviceLogList.clearDeviceLogs(deviceLogs);
-                            HyperLog.i(TAG, "Log has been pushed");
+                            HyperLog.d(TAG, "Log has been pushed");
 
                             if (callback != null && temp[0] == 0) {
                                 if (isAllLogsPushed[0]) {
