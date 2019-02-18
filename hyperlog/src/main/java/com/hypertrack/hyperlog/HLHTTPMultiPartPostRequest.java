@@ -224,7 +224,7 @@ class HLHTTPMultiPartPostRequest<T> extends Request<T> {
 
     @Override
     protected void deliverResponse(T response) {
-        HyperLog.i(TAG, "deliverResponse: ");
+        HyperLog.d(TAG, "deliverResponse: ");
         if (mListener != null && mListener.get() != null)
             mListener.get().onResponse(response);
     }
