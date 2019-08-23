@@ -120,11 +120,11 @@ class HLHTTPMultiPartPostRequest<T> extends Request<T> {
     private byte[] getRequestBody(byte[] requestBody) {
         byte[] compressedRequestBody = getCompressed(requestBody);
         if (mGzipEnabled) {
-            HyperLog.i(TAG, "Compressed FileSize: " + compressedRequestBody.length + " Bytes");
+            HyperLog.v(TAG, "Compressed FileSize: " + compressedRequestBody.length + " Bytes");
             return compressedRequestBody;
         } else {
             try {
-                HyperLog.i(TAG, "Compressed FileSize: " + requestBody.length + " Bytes");
+                HyperLog.v(TAG, "Compressed FileSize: " + requestBody.length + " Bytes");
                 return requestBody;
             } catch (Exception exception) {
                 HyperLog.e(TAG, "Exception occurred while getRequestBody: " + exception);
@@ -194,10 +194,10 @@ class HLHTTPMultiPartPostRequest<T> extends Request<T> {
 
         try {
             String json = new String(
-                    volleyError.networkResponse.data, HttpHeaderParser.parseCharset(volleyError.networkResponse.headers));
+                volleyError.networkResponse.data, HttpHeaderParser.parseCharset(volleyError.networkResponse.headers));
 
-            HyperLog.i(TAG, "Status Code: " + volleyError.networkResponse.statusCode +
-                    " Data: " + json);
+            HyperLog.v(TAG, "Status Code: " + volleyError.networkResponse.statusCode +
+                " Data: " + json);
 
         } catch (Exception e) {
             HyperLog.e(TAG, "Exception occurred while HTTPPatchRequest parseNetworkError: " + e, e);
@@ -210,10 +210,10 @@ class HLHTTPMultiPartPostRequest<T> extends Request<T> {
     protected Response<T> parseNetworkResponse(NetworkResponse response) {
         try {
             String json = new String(
-                    response.data, HttpHeaderParser.parseCharset(response.headers));
+                response.data, HttpHeaderParser.parseCharset(response.headers));
 
             return Response.success(
-                    mGson.fromJson(json, mResponseType), HttpHeaderParser.parseCacheHeaders(response));
+                mGson.fromJson(json, mResponseType), HttpHeaderParser.parseCacheHeaders(response));
 
         } catch (UnsupportedEncodingException e) {
             return Response.error(new ParseError(e));
@@ -224,7 +224,6 @@ class HLHTTPMultiPartPostRequest<T> extends Request<T> {
 
     @Override
     protected void deliverResponse(T response) {
-        HyperLog.d(TAG, "deliverResponse: ");
         if (mListener != null && mListener.get() != null)
             mListener.get().onResponse(response);
     }

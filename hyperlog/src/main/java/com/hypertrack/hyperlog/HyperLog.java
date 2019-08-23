@@ -25,9 +25,10 @@ SOFTWARE.
 package com.hypertrack.hyperlog;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -52,7 +53,7 @@ public class HyperLog {
     public static final String TAG_ASSERT = "ASSERT";
     public static final String TAG_HYPERLOG = "HYPERLOG";
 
-    private static int logLevel = Log.WARN;
+    private static int logLevel = Log.VERBOSE;
 
     private static DeviceLogList mDeviceLogList;
     private static String URL;
@@ -110,7 +111,7 @@ public class HyperLog {
                                   @NonNull LogFormat logFormat) {
 
         if (context == null) {
-            Log.e(TAG, "HyperLog isn't initialized: Context couldn't be null");
+            //Log.e(TAG, "HyperLog isn't initialized: Context couldn't be null");
             return;
         }
 
@@ -201,7 +202,7 @@ public class HyperLog {
     public static void v(String tag, String message, Throwable tr) {
         if (Log.VERBOSE >= logLevel) {
             Log.v(tag, message + '\n' + Log.getStackTraceString(tr));
-            r(getFormattedLog(logLevel, tag, message));
+            r(getFormattedLog(Log.VERBOSE, tag, message));
         }
     }
 
@@ -212,7 +213,7 @@ public class HyperLog {
     public static void d(String tag, String message, Throwable tr) {
         if (Log.DEBUG >= logLevel) {
             Log.d(tag, message + '\n' + Log.getStackTraceString(tr));
-            r(getFormattedLog(logLevel, tag, message));
+            r(getFormattedLog(Log.DEBUG, tag, message));
         }
     }
 
@@ -260,10 +261,10 @@ public class HyperLog {
         if (Log.ERROR >= logLevel) {
             Log.e(tag, "**********************************************");
             Log.e(tag, "EXCEPTION: " + getMethodName() + ", " + message + '\n' +
-                    Log.getStackTraceString(tr));
+                Log.getStackTraceString(tr));
             Log.e(tag, "**********************************************");
             r(getFormattedLog(Log.ERROR, tag, "EXCEPTION: " + getMethodName() + ", "
-                    + message));
+                + message));
         }
     }
 
@@ -484,12 +485,12 @@ public class HyperLog {
 
             if (deviceLogList != null && !deviceLogList.isEmpty()) {
                 file = Utils.writeStringsToFile(mContext, getDeviceLogsAsStringList(deviceLogList),
-                        fileName);
+                    fileName);
                 if (file != null) {
                     if (deleteLogs)
                         mDeviceLogList.clearDeviceLogs(deviceLogList);
                     HyperLog.i(TAG, "Log File has been created at " +
-                            file.getAbsolutePath());
+                        file.getAbsolutePath());
                 }
             }
             logsBatchCount--;
@@ -610,14 +611,14 @@ public class HyperLog {
      * @throws IllegalArgumentException if the API endpoint url is empty or null
      */
     public static void pushLogs(Context mContext, String fileName, HashMap<String,
-            String> additionalHeaders, boolean compress, final HLCallback callback) {
+        String> additionalHeaders, boolean compress, final HLCallback callback) {
 
         if (!isInitialize())
             return;
 
         if (TextUtils.isEmpty(URL)) {
             HyperLog.e(TAG, "API endpoint URL is missing. Set URL using " +
-                    "HyperLog.setURL method");
+                "HyperLog.setURL method");
             return;
         }
 
@@ -639,9 +640,9 @@ public class HyperLog {
         while (logsBatchCount != 0) {
 
             final List<DeviceLogModel> deviceLogs = getDeviceLogs(false, logsBatchCount);
-            HyperLog.d(TAG, "Log Counts: " + deviceLogs.size() + " | File Size: " +
-                    deviceLogs.toString().length() + " bytes.");
-            //Get string data into byte format.
+            // HyperLog.v(TAG, "Log Counts: " + deviceLogs.size() + " | File Size: " + deviceLogs.toString().length() + " bytes.");
+
+            // Get string data into byte format.
             byte[] bytes = Utils.getByteData(deviceLogs);
 
             if (TextUtils.isEmpty(fileName)) {
@@ -649,41 +650,41 @@ public class HyperLog {
             }
 
             HLHTTPMultiPartPostRequest hlHTTPMultiPartPostRequest =
-                    new HLHTTPMultiPartPostRequest<>(URL, bytes, fileName, additionalHeaders,
-                            mContext, Object.class, compress, new Response.Listener<Object>() {
-                        @Override
-                        public void onResponse(Object response) {
-                            temp[0]--;
-                            mDeviceLogList.clearDeviceLogs(deviceLogs);
-                            HyperLog.d(TAG, "Log has been pushed");
+                new HLHTTPMultiPartPostRequest<>(URL, bytes, fileName, additionalHeaders,
+                    mContext, Object.class, compress, new Response.Listener<Object>() {
+                    @Override
+                    public void onResponse(Object response) {
+                        temp[0]--;
+                        mDeviceLogList.clearDeviceLogs(deviceLogs);
+                        // HyperLog.v(TAG, "Log has been pushed");
 
-                            if (callback != null && temp[0] == 0) {
-                                if (isAllLogsPushed[0]) {
-                                    callback.onSuccess(response);
-                                } else {
-                                    HLErrorResponse HLErrorResponse = new HLErrorResponse(
-                                            "All logs hasn't been pushed");
-                                    callback.onError(HLErrorResponse);
-                                }
+                        if (callback != null && temp[0] == 0) {
+                            if (isAllLogsPushed[0]) {
+                                callback.onSuccess(response);
+                            } else {
+                                HLErrorResponse HLErrorResponse = new HLErrorResponse(
+                                    "All logs hasn't been pushed");
+                                callback.onError(HLErrorResponse);
                             }
                         }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            HLErrorResponse HLErrorResponse = new HLErrorResponse(error);
-                            isAllLogsPushed[0] = false;
-                            temp[0]--;
-                            error.printStackTrace();
-                            HyperLog.exception(TAG, "Error has occurred while pushing " +
-                                    "logs: ", error);
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        HLErrorResponse HLErrorResponse = new HLErrorResponse(error);
+                        isAllLogsPushed[0] = false;
+                        temp[0]--;
+                        error.printStackTrace();
+                        // HyperLog.exception(TAG, "Error has occurred while pushing " +
+                        //     "logs: ", error);
 
-                            if (temp[0] == 0) {
-                                if (callback != null) {
-                                    callback.onError(HLErrorResponse);
-                                }
+                        if (temp[0] == 0) {
+                            if (callback != null) {
+                                callback.onError(HLErrorResponse);
                             }
                         }
-                    });
+                    }
+                });
 
             VolleyUtils.addToRequestQueue(mContext, hlHTTPMultiPartPostRequest, TAG);
             logsBatchCount--;
